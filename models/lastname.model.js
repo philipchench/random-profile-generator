@@ -1,8 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const ProfileMain = sequelize.define("profile_main", {
-    firstname: {
-      type: Sequelize.STRING,
-    },
+  const LastName = sequelize.define("last_name", {
     lastname: {
       type: Sequelize.STRING,
     },
@@ -14,5 +11,5 @@ module.exports = (sequelize, Sequelize) => {
     },
   });
 
-  return ProfileMain;
+  return LastName;
 };

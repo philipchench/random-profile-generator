@@ -18,9 +18,12 @@ if (config.use_env_variable) {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.profileMain = require("../models/profile-main.model.js")(
-  sequelize,
-  Sequelize
-);
+db.ethnicity = require("../models/ethnicity.model.js")(sequelize, Sequelize);
+
+db.firstName = require("../models/firstname.model.js")(sequelize, Sequelize);
+
+db.lastName = require("../models/lastname.model.js")(sequelize, Sequelize);
+
+console.log(db.lastName);
 
 module.exports = db;

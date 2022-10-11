@@ -9,7 +9,9 @@ module.exports = function (app) {
     next();
   });
 
-  app.get("/api/random-profile-main", controller.randomProfileMain);
+  app.post("/api/add-ethnicity", controller.addEthnicity);
 
-  app.post("/api/add-profile-main", controller.addProfileMain);
+  app.post("/api/add-first-name", controller.addFirstName);
+
+  app.post("/api/add-last-name", controller.addLastName);
 };
