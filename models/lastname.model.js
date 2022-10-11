@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
     gender: {
       type: Sequelize.STRING,
     },
-    ethnicity: {
+    ethnic: {
       type: Sequelize.STRING,
     },
   });

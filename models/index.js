@@ -24,6 +24,17 @@ db.firstName = require("../models/firstname.model.js")(sequelize, Sequelize);
 
 db.lastName = require("../models/lastname.model.js")(sequelize, Sequelize);
 
+db.ethnicity.hasMany(db.firstName, {
+  foreignKey: "ethnic",
+  as: "FirstName",
+});
+db.firstName.belongsTo(db.ethnicity);
+db.ethnicity.hasMany(db.lastName, {
+  foreignKey: "ethnic",
+  as: "LastName",
+});
+db.lastName.belongsTo(db.ethnicity);
+
 console.log(db.lastName);
 
 module.exports = db;
