@@ -47,30 +47,54 @@ exports.addEthnicity = (req, res) => {
     });
 };
 // POST request to add first name
-exports.addFirstName = (req, res) => {
-  FirstName.create({
-    firstname: req.body.firstname,
-    gender: req.body.gender,
-    ethnicity: req.body.ethnicity,
-  })
-    .then((name) => {
-      res.send({ message: "First name " + name.firstname + " added!" });
-    })
-    .catch((err) => {
+exports.addFirstName = async (req, res) => {
+  const currEthnicity = await Ethnicity.findOne({
+    where: { ethnicity: req.body.ethnic },
+  });
+  if (currEthnicity === null) {
+    res.status(500).send({ message: "Ethnicity not in table yet." });
+  } else {
+    try {
+      const name = await FirstName.create({
+        firstname: req.body.firstname,
+        gender: req.body.gender,
+        ethnic: req.body.ethnicity,
+      });
+      await currEthnicity.hasFirstName(name);
+      currEthnicity.getFirstName().then((eth) => {
+        res.send({
+          message: "First name " + name.firstname + " added!",
+          ethnicList: eth,
+        });
+      });
+    } catch (err) {
       res.status(500).send({ message: err.message });
-    });
+    }
+  }
 };
 // POST request to add last name
-exports.addLastName = (req, res) => {
-  LastName.create({
-    lastname: req.body.lastname,
-    gender: req.body.gender,
-    ethnicity: req.body.ethnicity,
-  })
-    .then((name) => {
-      res.send({ message: "Last name " + name.lastname + " added!" });
-    })
-    .catch((err) => {
+exports.addLastName = async (req, res) => {
+  const currEthnicity = await Ethnicity.findOne({
+    where: { ethnicity: req.body.ethnic },
+  });
+  if (currEthnicity === null) {
+    res.status(500).send({ message: "Ethnicity not in table yet." });
+  } else {
+    try {
+      const name = await LastName.create({
+        lastname: req.body.lastname,
+        gender: req.body.gender,
+        ethnic: req.body.ethnicity,
+      });
+      await currEthnicity.hasLastName(name);
+      currEthnicity.getLastName().then((eth) => {
+        res.send({
+          message: "Last name " + name.lastname + " added!",
+          ethnicList: eth,
+        });
+      });
+    } catch (err) {
       res.status(500).send({ message: err.message });
-    });
+    }
+  }
 };
