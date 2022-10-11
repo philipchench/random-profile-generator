@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Ethnicity = sequelize.define("ethnicity", {
-    ethnicity: {
+    language: {
       type: Sequelize.STRING,
       primaryKey: true,
     },
