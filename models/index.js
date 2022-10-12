@@ -20,7 +20,7 @@ db.Sequelize = Sequelize;
 
 db.background = require("./background.model.js")(sequelize, Sequelize);
 
-db.firstName = require("../models/firstname.model.js")(sequelize, Sequelize);
+db.firstName = require("./firstname.model.js")(sequelize, Sequelize);
 
 db.surname = require("./surname.model.js")(sequelize, Sequelize);
 
