@@ -21,7 +21,7 @@ db.sequelize.sync({ alter: true });
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "This is the random-profile-generator backend." });
+  res.json({ message: "This is the Diversify profile generator backend." });
 });
 
 require("./routes/routes")(app);

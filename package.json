@@ -1,7 +1,7 @@
 {
-  "name": "random-profile-generator",
+  "name": "diversify-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Server for Diversify",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

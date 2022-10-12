@@ -18,23 +18,21 @@ if (config.use_env_variable) {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.ethnicity = require("../models/ethnicity.model.js")(sequelize, Sequelize);
+db.background = require("./background.model.js")(sequelize, Sequelize);
 
 db.firstName = require("../models/firstname.model.js")(sequelize, Sequelize);
 
-db.lastName = require("../models/lastname.model.js")(sequelize, Sequelize);
+db.surname = require("./surname.model.js")(sequelize, Sequelize);
 
-db.ethnicity.hasMany(db.firstName, {
+db.background.hasMany(db.firstName, {
   foreignKey: "language",
   as: "FirstName",
 });
-db.firstName.belongsTo(db.ethnicity);
-db.ethnicity.hasMany(db.lastName, {
+db.firstName.belongsTo(db.background);
+db.background.hasMany(db.surname, {
   foreignKey: "language",
-  as: "LastName",
+  as: "Surname",
 });
-db.lastName.belongsTo(db.ethnicity);
-
-console.log(db.lastName);
+db.surname.belongsTo(db.background);
 
 module.exports = db;

@@ -9,9 +9,9 @@ module.exports = function (app) {
     next();
   });
 
-  app.post("/api/add-ethnicity", controller.addEthnicity);
+  app.post("/api/add-background", controller.addBackground);
 
-  app.post("/api/add-first-name", controller.addFirstName);
+  app.post("/api/add-firstname", controller.addFirstName);
 
-  app.post("/api/add-last-name", controller.addLastName);
+  app.post("/api/add-surname", controller.addSurname);
 };

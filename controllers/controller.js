@@ -1,7 +1,7 @@
 const db = require("../models");
-const Ethnicity = db.ethnicity;
+const Background = db.background;
 const FirstName = db.firstName;
-const LastName = db.lastName;
+const Surname = db.surname;
 
 const Gender = {
   Male: "male",
@@ -10,7 +10,7 @@ const Gender = {
   Unisex: "unisex",
 };
 
-const SexOrient = {
+const Orientation = {
   Heterosexual: "heterosexual",
   Gay: "gay",
   Lesbian: "lesbian",
@@ -34,38 +34,39 @@ const SexOrient = {
 //     });
 // };
 
-// POST request to add ethnicity
-exports.addEthnicity = (req, res) => {
-  Ethnicity.create({
+// POST request to add background
+exports.addBackground = (req, res) => {
+  Background.create({
     language: req.body.language,
     race: req.body.race,
   })
-    .then((eth) => {
-      res.send({ message: "Ethnicity " + eth.language + " added!" });
+    .then((bg) => {
+      res.send({ message: "Language " + bg.language + " added!" });
     })
     .catch((err) => {
       res.status(500).send({ message: err.message });
     });
 };
+
 // POST request to add first name
 exports.addFirstName = async (req, res) => {
-  const currEthnicity = await Ethnicity.findOne({
+  const currBg = await Background.findOne({
     where: { language: req.body.language },
   });
-  if (currEthnicity === null) {
-    res.status(500).send({ message: "Ethnicity not in table yet." });
+  if (currBg === null) {
+    res.status(500).send({ message: "Language not in table yet." });
   } else {
     try {
       const name = await FirstName.create({
-        firstname: req.body.firstname,
+        firstName: req.body.firstName,
         gender: req.body.gender,
         language: req.body.language,
       });
-      await currEthnicity.hasFirstName(name);
-      currEthnicity.getFirstName().then((eth) => {
+      await currBg.hasFirstName(name);
+      currBg.getFirstName().then((bg) => {
         res.send({
-          message: "First name " + name.firstname + " added!",
-          ethnicList: eth,
+          message: "First name " + name.firstName + " added!",
+          background: bg,
         });
       });
     } catch (err) {
@@ -73,25 +74,26 @@ exports.addFirstName = async (req, res) => {
     }
   }
 };
+
 // POST request to add last name
-exports.addLastName = async (req, res) => {
-  const currEthnicity = await Ethnicity.findOne({
+exports.addSurname = async (req, res) => {
+  const currBg = await Background.findOne({
     where: { language: req.body.language },
   });
-  if (currEthnicity === null) {
-    res.status(500).send({ message: "Ethnicity not in table yet." });
+  if (currBg === null) {
+    res.status(500).send({ message: "Language not in table yet." });
   } else {
     try {
-      const name = await LastName.create({
-        lastname: req.body.lastname,
+      const name = await Surname.create({
+        surname: req.body.surname,
         gender: req.body.gender,
         language: req.body.language,
       });
-      await currEthnicity.hasLastName(name);
-      currEthnicity.getLastName().then((eth) => {
+      await currBg.hasSurname(name);
+      currBg.getSurname().then((bg) => {
         res.send({
-          message: "Last name " + name.lastname + " added!",
-          ethnicList: eth,
+          message: "Last name " + name.surname + " added!",
+          background: bg,
         });
       });
     } catch (err) {
