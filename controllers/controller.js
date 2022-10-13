@@ -1,4 +1,5 @@
 const db = require("../models");
+const { Op } = require("sequelize");
 const Background = db.background;
 const FirstName = db.firstName;
 const Surname = db.surname;
@@ -18,21 +19,6 @@ const Orientation = {
   Asexual: "asexual",
   Pansexual: "pansexual",
 };
-
-// GET request to test return random profileMain entry
-// exports.randomProfileMain = (req, res) => {
-//   ProfileMain.findOne({
-//     order: [db.Sequelize.fn("RANDOM")],
-//   })
-//     .then((data) => {
-//       res.send(data);
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         message: err.message,
-//       });
-//     });
-// };
 
 // POST request to add background
 exports.addBackground = (req, res) => {
@@ -98,5 +84,110 @@ exports.addSurname = async (req, res) => {
     } catch (err) {
       res.status(500).send({ message: err.message });
     }
+  }
+};
+
+// GET request to generate random profile
+exports.generateProfile = async (req, res) => {
+  switch (parseInt(req.params.score)) {
+    case 1:
+      handleOne(req, res);
+      break;
+    case 2:
+      handleTwo(req, res);
+      break;
+    case 3:
+      res.send("case " + req.params.score);
+      break;
+    case 4:
+      res.send("case " + req.params.score);
+      break;
+    case 5:
+      res.send("case " + req.params.score);
+      break;
+    default:
+      res.status(400).send("Bad input");
+  }
+};
+
+const handleOne = async (req, res) => {
+  try {
+    // get first name
+    FirstName.findAll({
+      where: {
+        language: "Basic",
+        gender: "male",
+      },
+    }).then((names) => {
+      // pick random name
+      const name = names[Math.floor(Math.random() * names.length)];
+      // get surname
+      Surname.findAll({
+        where: { language: "Basic" },
+      }).then((surnames) => {
+        const surname = surnames[Math.floor(Math.random() * surnames.length)];
+        res.json({
+          firstname: name.firstName,
+          surname: surname.surname,
+          gender: name.gender,
+          race: "White",
+          sexOr: Orientation.Heterosexual,
+          score: req.params.score,
+        });
+      });
+    });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+const handleTwo = async (req, res) => {
+  try {
+    // get background
+    Background.findAll({
+      where: {
+        [Op.or]: [{ race: "Asian" }, { race: "White" }],
+      },
+    }).then((politicallyIncorrectBgs) => {
+      // pick random background
+      const bg =
+        politicallyIncorrectBgs[
+          Math.floor(Math.random() * politicallyIncorrectBgs.length)
+        ];
+      // get first name
+      FirstName.findAll({
+        where: { language: bg.language, gender: "male" },
+      }).then((ethnicnames) => {
+        FirstName.findAll({
+          where: { language: "Basic" },
+        }).then((basicnames) => {
+          FirstName.findAll({
+            where: { language: "English", gender: "male" },
+          }).then((englishnames) => {
+            const nameList = [ethnicnames, englishnames, basicnames];
+            // pick between ethnic name or English name
+            const names = nameList[Math.floor(Math.random() * nameList.length)];
+            const name = names[Math.floor(Math.random() * names.length)];
+            // get surname
+            Surname.findAll({
+              where: { language: bg.language },
+            }).then((surnames) => {
+              const surname =
+                surnames[Math.floor(Math.random() * surnames.length)];
+              res.json({
+                firstname: name.firstName,
+                surname: surname.surname,
+                gender: name.gender,
+                race: bg.race,
+                sexOr: Orientation.Heterosexual,
+                score: req.params.score,
+              });
+            });
+          });
+        });
+      });
+    });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
   }
 };

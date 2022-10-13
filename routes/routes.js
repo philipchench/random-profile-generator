@@ -15,6 +15,8 @@ module.exports = function (app) {
     next();
   });
 
+  app.get("/api/generate-profile/:score", controller.generateProfile);
+
   app.post("/api/add-background", controller.addBackground);
 
   app.post("/api/add-firstname", controller.addFirstName);
