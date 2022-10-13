@@ -86,7 +86,6 @@ exports.addSurname = async (req, res) => {
     try {
       const name = await Surname.create({
         surname: req.body.surname,
-        gender: req.body.gender,
         language: req.body.language,
       });
       await currBg.hasSurname(name);
