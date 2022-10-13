@@ -20,6 +20,8 @@ const Orientation = {
   Pansexual: "pansexual",
 };
 
+const races = ["White", "Black", "Arab", "Asian"];
+
 // POST request to add background
 exports.addBackground = (req, res) => {
   Background.create({
@@ -97,13 +99,13 @@ exports.generateProfile = async (req, res) => {
       handleTwo(req, res);
       break;
     case 3:
-      res.send("case " + req.params.score);
+      handleThree(req, res);
       break;
     case 4:
-      res.send("case " + req.params.score);
+      handleFour(req, res);
       break;
     case 5:
-      res.send("case " + req.params.score);
+      handleFive(req, res);
       break;
     default:
       res.status(400).send("Bad input");
@@ -132,6 +134,7 @@ const handleOne = async (req, res) => {
           gender: name.gender,
           race: "White",
           sexOr: Orientation.Heterosexual,
+          transgender: false,
           score: req.params.score,
         });
       });
@@ -159,12 +162,16 @@ const handleTwo = async (req, res) => {
         where: { language: bg.language, gender: "male" },
       }).then((ethnicnames) => {
         FirstName.findAll({
-          where: { language: "Basic" },
+          where: { language: "Basic", gender: "female" },
         }).then((basicnames) => {
           FirstName.findAll({
-            where: { language: "English", gender: "male" },
-          }).then((englishnames) => {
-            const nameList = [ethnicnames, englishnames, basicnames];
+            where: { language: "Basic", gender: "male" },
+          }).then((malebasicnames) => {
+            var nameList = [ethnicnames, malebasicnames];
+            // can have white females
+            if (bg.race == "White") {
+              nameList = [ethnicnames, malebasicnames, basicnames];
+            }
             // pick between ethnic name or English name
             const names = nameList[Math.floor(Math.random() * nameList.length)];
             const name = names[Math.floor(Math.random() * names.length)];
@@ -180,6 +187,7 @@ const handleTwo = async (req, res) => {
                 gender: name.gender,
                 race: bg.race,
                 sexOr: Orientation.Heterosexual,
+                transgender: false,
                 score: req.params.score,
               });
             });
@@ -187,6 +195,204 @@ const handleTwo = async (req, res) => {
         });
       });
     });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+const handleThree = async (req, res) => {
+  const selectedRace = races[Math.floor(Math.random() * races.length)];
+  try {
+    // get background
+    Background.findAll({ where: { race: selectedRace } }).then(
+      (politicallyIncorrectBgs) => {
+        // pick random background
+        const bg =
+          politicallyIncorrectBgs[
+            Math.floor(Math.random() * politicallyIncorrectBgs.length)
+          ];
+        // get first name
+        FirstName.findAll({
+          where: { language: bg.language },
+        }).then((ethnicnames) => {
+          FirstName.findAll({
+            where: { language: "Basic" },
+          }).then((basicnames) => {
+            var nameList = [ethnicnames, basicnames];
+            // pick between ethnic name or English name
+            const names = nameList[Math.floor(Math.random() * nameList.length)];
+            const name = names[Math.floor(Math.random() * names.length)];
+            // get surname
+            Surname.findAll({
+              where: { language: bg.language },
+            }).then((surnames) => {
+              const surname =
+                surnames[Math.floor(Math.random() * surnames.length)];
+              var sexOri = Orientation.Heterosexual;
+              if (
+                (Math.random() < 0.2 ||
+                  (selectedRace == "White" && name.language == "Basic")) &&
+                selectedRace != "Arab"
+              ) {
+                sexOri =
+                  name.gender == "male" ? Orientation.Gay : Orientation.Lesbian;
+              }
+              res.json({
+                firstname: name.firstName,
+                surname: surname.surname,
+                gender: name.gender,
+                race: bg.race,
+                sexOr: sexOri,
+                transgender:
+                  Math.random() < 0.05 && selectedRace != "Arab" ? true : false,
+                score: req.params.score,
+              });
+            });
+          });
+        });
+      }
+    );
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+const handleFour = async (req, res) => {
+  const selectedRace = races[Math.floor(Math.random() * races.length)];
+  try {
+    // get background
+    Background.findAll({ where: { race: selectedRace } }).then(
+      (politicallyIncorrectBgs) => {
+        // pick random background
+        const bg =
+          politicallyIncorrectBgs[
+            Math.floor(Math.random() * politicallyIncorrectBgs.length)
+          ];
+        // get first name
+        FirstName.findAll({
+          where: { language: bg.language },
+        }).then((ethnicnames) => {
+          FirstName.findAll({
+            where: { language: "Basic" },
+          }).then((basicnames) => {
+            var nameList = [ethnicnames, basicnames];
+            // pick between ethnic name or English name
+            const names = nameList[Math.floor(Math.random() * nameList.length)];
+            const name = names[Math.floor(Math.random() * names.length)];
+            // get surname
+            Surname.findAll({
+              where: { language: bg.language },
+            }).then((surnames) => {
+              const surname =
+                surnames[Math.floor(Math.random() * surnames.length)];
+              var sexOri =
+                name.gender == "male" ? Orientation.Gay : Orientation.Lesbian;
+              const prob = Math.random();
+              if (prob < 0.15) {
+                sexOri = Orientation.Asexual;
+              } else if (prob < 0.2) {
+                sexOri = Orientation.Pansexual;
+              } else if (prob < 0.35) {
+                sexOri = Orientation.Bisexual;
+              }
+              var gender = name.gender;
+              var cannotTrans = false;
+              const prob2 = Math.random();
+              if (
+                prob2 < 0.05 &&
+                sexOri != Orientation.Gay &&
+                sexOri != Orientation.Lesbian
+              ) {
+                gender = Gender.Unisex;
+                cannotTrans = true;
+              } else if (
+                prob2 < 0.15 &&
+                sexOri != Orientation.Gay &&
+                sexOri != Orientation.Lesbian
+              ) {
+                gender = Gender.NonBinary;
+                cannotTrans = true;
+              }
+              res.json({
+                firstname: name.firstName,
+                surname: surname.surname,
+                gender: gender,
+                race: bg.race,
+                sexOr: sexOri,
+                transgender:
+                  Math.random() < 0.25 && cannotTrans == false ? true : false,
+                score: req.params.score,
+              });
+            });
+          });
+        });
+      }
+    );
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+const handleFive = async (req, res) => {
+  const selectedRace = races[Math.floor(Math.random() * races.length)];
+  try {
+    // get background
+    Background.findAll({ where: { race: selectedRace } }).then(
+      (politicallyIncorrectBgs) => {
+        // pick random background
+        const bg =
+          politicallyIncorrectBgs[
+            Math.floor(Math.random() * politicallyIncorrectBgs.length)
+          ];
+        // get first name
+        FirstName.findAll({}).then((names) => {
+          const name = names[Math.floor(Math.random() * names.length)];
+          // get surname
+          Surname.findAll({}).then((surnames) => {
+            const surname =
+              surnames[Math.floor(Math.random() * surnames.length)];
+            var sexOri =
+              name.gender == "male" ? Orientation.Gay : Orientation.Lesbian;
+            const prob = Math.random();
+            if (prob < 0.2) {
+              sexOri = Orientation.Asexual;
+            } else if (prob < 0.4) {
+              sexOri = Orientation.Pansexual;
+            } else if (prob < 0.6) {
+              sexOri = Orientation.Bisexual;
+            }
+            var gender = name.gender;
+            var cannotTrans = false;
+            const prob2 = Math.random();
+            if (
+              prob2 < 0.1 &&
+              sexOri != Orientation.Gay &&
+              sexOri != Orientation.Lesbian
+            ) {
+              gender = Gender.Unisex;
+              cannotTrans = true;
+            } else if (
+              prob2 < 0.35 &&
+              sexOri != Orientation.Gay &&
+              sexOri != Orientation.Lesbian
+            ) {
+              gender = Gender.NonBinary;
+              cannotTrans = true;
+            }
+            res.json({
+              firstname: name.firstName,
+              surname: surname.surname,
+              gender: gender,
+              race: bg.race,
+              sexOr: sexOri,
+              transgender:
+                Math.random() < 0.5 && cannotTrans == false ? true : false,
+              score: req.params.score,
+            });
+          });
+        });
+      }
+    );
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
